@@ -19,13 +19,13 @@ in the process of rename. It simply skips.
 Files
 -----
 
-'''
+```
 exif.py
 	exif.pyc
 nikon.py
 	nikon.pyc
 index.py
-'''
+```
 
 Disclaimer
 ----------
