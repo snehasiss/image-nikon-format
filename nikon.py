@@ -57,10 +57,13 @@ class nikon:
 	def process (self):
 		for filename in self.files:
 			self.parse (filename)
-			out = '%20s  %12s  %13s' % ( self.code, self.filename, self.newname )
+			out = '%20s  %-14s  %13s' % ( self.code, self.filename, self.newname )
 			if self.change:
-				out = out + '  OK'
-				os.rename (self.filename, self.newname)
+				if os.path.isfile (self.newname):
+					out = out + '  __SKIPPED__'
+				else:
+					out = out + '  OK'
+					os.rename (self.filename, self.newname)
 			print out
 			
 
