@@ -26,15 +26,24 @@ class nikon:
 		day   = '%02d' % int (day)
 
 		# hour format
-		offset = 10
 		hour   = int (hour)
-		if ( hour < offset ): hour = '%1d' % hour
-		else: hour = '%1s' % chr ( hour - offset + ord ('A') )
+		hour = '%1s' % chr ( hour + ord ('A') )
 
 		# min, sec, subsec format in hex
-		time = int (minute) * 60 + int (sec)  
-		time = time * 10 + int(subsec)/10
+		time = int (minute) * 600 + int (sec) * 10 + int(subsec)/10  
 		time = '%04X' % time
+
+		# new format for time introduced here 
+		number = list (time)
+		i = 0
+		for d in number:
+			x = int ( d, 16 )
+			e = chr ( x + ord ('A') )
+			number[i] = '%1s' % e
+			i = i + 1
+
+		time = ''.join (number)
+		# new format of time ends
 
 		self.newname = year + month + day + '_' + hour + time + '.' + self.suffix
 
