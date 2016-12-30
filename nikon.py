@@ -3,6 +3,8 @@ import os
 
 class nikon:
 	files = []
+	skipped = {}
+
 	def __init__ (self, args):
 		prefix      = args.get('prefix') or 'DSC'
 		self.suffix = args.get('suffix') or 'NEF'
@@ -13,39 +15,34 @@ class nikon:
 			if f.endswith (self.suffix) and f.startswith (prefix):
 				self.files.append (f)
 
+	def toyear (self, year):
+		year  = '%1s' %  chr ( int(year) - 2011 + ord ('A') )
+		return year
+
+	def tomonth (self, month):
+		month = '%1X' % int (month)
+		return month
+
+	def today (self, day):
+		day   = '%02d' % int (day)
+		return day
+
+	def tohour (self, hour):
+		hour   = int (hour)
+		hour = '%1s' % chr ( hour + ord ('A') )
+		return hour
+
+	def totime (self, minute, second, subsec):
+		time = '%02s%02s%1s' % (minute, second, int (subsec) / 10)
+		return time
+
 	def format (self, datestr):
 		year, month, day  = datestr.get('date').split (':')
 		hour, minute, sec = datestr.get('time').split (':')
 		subsec = datestr.get('subsec')
 
-		self.code = '%04s%02s%02s-%02s%02s%02s.%02s' % (year, month, day, hour, minute, sec, subsec)
-
-		# date format
-		year  = '%1s' %  chr ( int(year) - 2011 + ord ('A') )
-		month = '%1X' % int (month)
-		day   = '%02d' % int (day)
-
-		# hour format
-		hour   = int (hour)
-		hour = '%1s' % chr ( hour + ord ('A') )
-
-		# min, sec, subsec format in hex
-		time = int (minute) * 600 + int (sec) * 10 + int(subsec)/10  
-		time = '%04X' % time
-
-		# new format for time introduced here 
-		number = list (time)
-		i = 0
-		for d in number:
-			x = int ( d, 16 )
-			e = chr ( x + ord ('A') )
-			number[i] = '%1s' % e
-			i = i + 1
-
-		time = ''.join (number)
-		# new format of time ends
-
-		self.newname = year + month + day + '_' + hour + time + '.' + self.suffix
+		self.code = '%04s-%02s-%02s-%02s-%02s-%02s-%02s' % (year, month, day, hour, minute, sec, subsec)
+		self.newname = self.toyear (year) + self.tomonth (month) + self.today (day) + self.tohour (hour) + '_' + self.totime (minute, sec, subsec) + '.' + self.suffix
 
 	def parse (self, filename):
 		self.filename = filename
@@ -54,8 +51,6 @@ class nikon:
 		with open (filename, 'rb') as f:
 			data = exif.process_file (f, stop_tag='UNDEF', details=False, strict=False, debug=False)
 		
-		#for key in keys:
-		#	print " %s: %s" %  (key, data[key].printable)
 
 		dateraw = data[ keys[0] ].printable
 		date, time = dateraw.split (' ')
@@ -70,6 +65,7 @@ class nikon:
 			if self.change:
 				if os.path.isfile (self.newname):
 					out = out + '  __SKIPPED__'
+
 				else:
 					out = out + '  OK'
 					os.rename (self.filename, self.newname)
