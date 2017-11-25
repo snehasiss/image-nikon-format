@@ -29,11 +29,13 @@ class nikon:
 
 	def tohour (self, hour):
 		hour   = int (hour)
-		hour = '%1s' % chr ( hour + ord ('A') )
+		#hour = '%1s' % chr ( hour + ord ('A') )
+		hour = '%02d' % hour
 		return hour
 
 	def totime (self, minute, second, subsec):
-		time = '%02s%02s%1s' % (minute, second, int (subsec) / 10)
+		#time = '%02s%02s%1s' % (minute, second, int (subsec) / 10)
+		time = '%02s%02s_%1s' % (minute, second, int (subsec) / 10)
 		return time
 
 	def format (self, datestr):
@@ -42,7 +44,8 @@ class nikon:
 		subsec = datestr.get('subsec')
 
 		self.code = '%04s-%02s-%02s-%02s-%02s-%02s-%02s' % (year, month, day, hour, minute, sec, subsec)
-		self.newname = self.toyear (year) + self.tomonth (month) + self.today (day) + self.tohour (hour) + '_' + self.totime (minute, sec, subsec) + '.' + self.suffix
+		#self.newname = self.toyear (year) + self.tomonth (month) + self.today (day) + self.tohour (hour) + '_' + self.totime (minute, sec, subsec) + '.' + self.suffix
+		self.newname = self.toyear (year) + self.tomonth (month) + self.today (day) + '_' + self.tohour (hour) + self.totime (minute, sec, subsec) + '.' + self.suffix.upper()
 
 	def parse (self, filename):
 		self.filename = filename
