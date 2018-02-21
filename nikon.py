@@ -63,7 +63,12 @@ class nikon:
 
 	def process (self):
 		for filename in self.files:
-			self.parse (filename)
+			try:
+				self.parse (filename)
+			except KeyError:
+				print '%20s  %-14s  __failed__' % ( self.code, self.filename )
+				next
+	
 			out = '%20s  %-14s  %13s' % ( self.code, self.filename, self.newname )
 			if self.change:
 				if os.path.isfile (self.newname):
