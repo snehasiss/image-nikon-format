@@ -16,18 +16,28 @@ class xtool:
 		 
 	
 	def extract (self):
+		#
+		# format: kMDItemFSContentChangeDate = 2018-07-07 14:32:46 +0000
+		#
 		out = os.popen (self.cmd + " " + self.obj['oldbase']+".MP4").read()
 		tmp = ""
 		for line in out.split ("\n"):
 		 	if (line.startswith (self.PARAMETER)):
 				tmp = line
 				break
+		
+		left,right = tmp.split (" = ", 1)
+		# right.lstrip(' ')
+		dt,tm,tz   = right.split (" ", 2)
+		dt = dt.replace ("-", "")
+		tm = tm.replace (":", "")
 
-		a,b = tmp.split (":", 1)
-		b = b.replace (":", "")
-		b = b.replace (" ", "_")
+		# a,b = tmp.split (":", 1)
+		# b = b.replace (":", "")
+		# b = b.replace (" ", "_")
 
-		self.obj['newbase'] = "TS" + b
+		# self.obj['newbase'] = "TS" + b
+		self.obj['newbase'] = "TS_" + dt + "_" + tm
 		return self
 	
 	def convert (self, too, confirm=False):

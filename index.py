@@ -19,7 +19,7 @@ def main (progname, argv):
 		elif opt in ('--suffix'): suffix = arg
 		elif opt in ('--change'): change = True
 
-	if not suffix in ('NEF', 'nef', 'JPG'):
+	if not suffix in ('NEF', 'nef', 'JPG', 'jpg'):
 		print 'supported file type: NEF, JPG'
 		sys.exit (2)
 

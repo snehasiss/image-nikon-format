@@ -16,7 +16,12 @@ class nikon:
 				self.files.append (f)
 
 	def toyear (self, year):
-		year  = '%1s' %  chr ( int(year) - 2011 + ord ('A') )
+		year  = int(year) - 2000
+		if year < 10:
+			year = '1%s' % year
+		else:
+			year  = '%1s' %  chr ( year - 10 + ord ('A') )
+
 		return year
 
 	def tomonth (self, month):
@@ -33,9 +38,10 @@ class nikon:
 		hour = '%02d' % hour
 		return hour
 
-	def totime (self, minute, second, subsec):
-		#time = '%02s%02s%1s' % (minute, second, int (subsec) / 10)
-		time = '%02s%02s_%1s' % (minute, second, int (subsec) / 10)
+	def totime (self, minute, second):
+		# time = '%02s%02s%1s' % (minute, second, int (subsec) / 10)
+		# time = '%02s%02s_%1s' % (minute, second, int (subsec) / 10)
+		time = '%02s%02s' % (minute, second)
 		return time
 
 	def format (self, datestr):
@@ -45,7 +51,27 @@ class nikon:
 
 		self.code = '%04s-%02s-%02s-%02s-%02s-%02s-%02s' % (year, month, day, hour, minute, sec, subsec)
 		#self.newname = self.toyear (year) + self.tomonth (month) + self.today (day) + self.tohour (hour) + '_' + self.totime (minute, sec, subsec) + '.' + self.suffix
-		self.newname = self.toyear (year) + self.tomonth (month) + self.today (day) + '_' + self.tohour (hour) + self.totime (minute, sec, subsec) + '.' + self.suffix.upper()
+		#print "subset: " + subsec 
+
+		self.idx = '%1s' % (int (subsec) / 10)
+		#print "index: " + self.idx
+
+		self.newbase = self.toyear (year) + self.tomonth (month) + self.today (day) + '_' + self.tohour (hour) + self.totime (minute, sec)
+		self.newname = self.newbase + '_' + self.idx + '.' + self.suffix.upper()
+
+	def get_next_idx (self, a):
+		v = ord (a)
+
+		if v >= ord ('0') and v <= ord ('9'):
+			v = ord ('A')
+		else:
+			v = v + 1
+
+		return '%1s' % (chr(v))
+
+	def getnext (self):
+		self.idx = self.get_next_idx (self.idx)
+		self.newname = self.newbase + '_' + self.idx + '.' + self.suffix.upper()
 
 	def parse (self, filename):
 		self.filename = filename
@@ -66,17 +92,19 @@ class nikon:
 			try:
 				self.parse (filename)
 			except KeyError:
-				print '%20s  %-14s  __failed__' % ( self.code, self.filename )
-				next
-	
-			out = '%20s  %-14s  %13s' % ( self.code, self.filename, self.newname )
-			if self.change:
-				if os.path.isfile (self.newname):
-					out = out + '  __SKIPPED__'
+				print '%20s  %-18s  __failed__' % ( self.code, self.filename )
+				continue
 
-				else:
-					out = out + '  OK'
-					os.rename (self.filename, self.newname)
+			if (self.filename == self.newname):
+				print '%20s  %-18s  __skipped_' % ( self.code, self.filename )
+				continue
+	
+			while ( os.path.isfile (self.newname) ):
+				self.getnext()
+
+			out = '%20s  %-18s  %-20s' % ( self.code, self.filename, self.newname )
+			if self.change:
+				os.rename (self.filename, self.newname)
 			print out
 			
 
