@@ -21,10 +21,13 @@ Files
 
 ```
 exif.py
-	exif.pyc
 nikon.py
-	nikon.pyc
-index.py
+index.py   : nikon dslr photo formatting
+
+vindex.py  :
+mindex.py  :
+p900.py    : p900 photo formatting
+dashcam.py : dashcam video formatting
 ```
 
 Disclaimer
